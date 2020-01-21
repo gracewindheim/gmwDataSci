@@ -1,3 +1,8 @@
 # testRepo
-test repo from class Jan 21, 2020
-*this is bold*
+test repo from class Jan 21, 2020. Markdown style
+
+*this is italicized*
+
+**this is bold**
+
+
