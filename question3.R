@@ -9,12 +9,18 @@ while (continue) {
   print(response)
   continue = (response != "q")
   
-  x = floor(runif(1, min=0, max=4))
-
-  print(x)
-  if (x == 1) {
-    print("Gryffindor")
+  if (continue) {
+    x = floor(runif(1, min=0, max=4))
+    
+    if (x == 0) {
+      print("Gryffindor")
+    } else if (x == 1) {
+      print("Hufflepuff")
+    } else if (x == 2) {
+      print("Ravenclaw")
+    } else {
+      print("Slytherin")
+    }
   }
-
   
 }
