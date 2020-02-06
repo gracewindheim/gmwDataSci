@@ -1,17 +1,33 @@
-# Assignment 2
 # question 1
 
-mylag <- function(vec, intlist) {
-  #loop through intlist to create lagged vectors
-  #final == resulting vector
-  #store each lagged vector in temp vector; cbind to final
-    #final = cbind(final,temp)
-  x = intlist
-  for (i in x) {
-    print(lag(vec, k=i))
+mylag <- function(L0, intlist) {
+  
+  #create matrix - default values are NA
+  lagged = matrix(nrow = length(L0), ncol = (length(intlist)))
+  labels = character(length(intlist)) #vector for labels
+  
+  endval = length(L0)-1
+  
+  #fill matrix values
+  currcol = 1
+  for(val in intlist) {
+    start = 1
     
+    if(val < length(L0)) {
+      for(i in val:endval) {
+        lagged[(1 + i), currcol] = L0[start]
+        start = start + 1
+      }
+    }
+    
+    #create label for the lagged vector
+    labels[currcol] = paste("L", val, sep = "")
+    currcol = currcol+1
   }
-  print(vec)
-  print(intlist)
+  
+  colnames(lagged) = labels #add labels to matrix
+  final = cbind(L0, lagged)
+  print(final)
+
 }
 
