@@ -3,15 +3,28 @@
 birthday = function(people) {
   
   n = 365
-  r = people
-  #perm = factorial(n) / factorial(n - r)
-  #cprob = perm / (365^npeople)
-
-  cprob = factorial(n) / ((n^people)*(factorial(n-people)))
+  perm = 1
   
-  prob = 1 - cprob
-  sprintf("Probability = %.5f", prob)
+  if (people <= 0) {
+    print("Probability = 0")
+  } else {
+    
+    for (i in 1:people) {
+      perm = perm * (n - (i-1))
+    }
+    cprob = perm / (365^people)
+    prob = 1 - cprob
+    print(prob)
+    
+  }
   
-  
+  #create a plot of probability by num people
+  x = c(1:100)
+  for (i in 1:100) {
+    x[i] = birthday(i)
+  }
+  r = data.frame(n = 1:100, Probability = x)
+  plot(r, main="Probability of two people in a room of n people sharing 
+       a birthday")
   
 }
