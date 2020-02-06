@@ -1,11 +1,6 @@
 #question 2
 
-install.packages('xml2')
-library('xml2')
+page = readLines("https://en.wikipedia.org/wiki/Alexander_the_Great")
+length(page)
 
-alexander = function() {
-  url = "https://en.wikipedia.org/wiki/Alexander_the_Great"
-  txt = read_html(url)
-  count.fields(txt, sep = "\n")
-  
-}
+#number of lines is 3691
