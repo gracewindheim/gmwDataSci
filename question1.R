@@ -1,7 +1,10 @@
 # question 1
+# Grace Windheim
 
 mylag <- function(L0, intlist) {
   
+  if (!isTRUE(all(intlist == floor(intlist)))) stop("Lagged value list must only contain integers")
+
   #create matrix - default values are NA
   lagged = matrix(nrow = length(L0), ncol = (length(intlist)))
   labels = character(length(intlist)) #vector for labels

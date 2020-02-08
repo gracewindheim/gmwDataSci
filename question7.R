@@ -1,4 +1,5 @@
 #question 7
+#Grace Windheim
 
 ppv = function(sens, spec, prev) {
   numerator = (sens*prev)

@@ -1,5 +1,8 @@
 #question 6
+#Grace Windheim
+
 #create a plot of probability by num people
+
 source("question6.R")
 
   x = c(1:100)
