@@ -18,5 +18,16 @@ birthday = function(people) {
     print(prob)
     
   }
-  
+
 }
+
+#create a plot of probability by num people
+
+x = c(1:100)
+for (i in 1:100) {
+  
+  x[i] = birthday(i)
+}
+r = data.frame(n = 1:100, Probability = x)
+plot(r, main="Probability of two people in a room of n people sharing 
+       a birthday") 
