@@ -1,0 +1,20 @@
+---
+title: "Favorite Place in Baltimore"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+
+My favorite place in Baltimore is Graffiti Alley!
+```{r leaflet}
+library("leaflet")
+
+the_map = leaflet() %>% addTiles() %>%
+  addMarkers(lat = 39.3115185, lng = -76.61881, popup = "Graffiti Alley")
+the_map
+```
+
+
