@@ -7,14 +7,11 @@ library(shiny)
 # Define server logic required to draw a histogram
 shinyServer(function(input, output) {
    
- if (input$hunits == 2) {
-   #convert to feet or vice versa
- }
-  
+ output$bmi = renderText({"hi"})
   # Calculate BMI
   
   
   # Print calculated BMI
-  output$bmi = renderText()
+  #output$bmi = renderText()
   
 })

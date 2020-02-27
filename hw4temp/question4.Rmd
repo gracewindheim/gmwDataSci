@@ -29,6 +29,14 @@ radioButtons("level", "Choose level:",
                  "Level 2" = "2",
                  "Level 3" = "3"))
 
+h4("Chosen type:")
+verbatimTextOutput("otype")
+output$otype = renderText({input$type})
+
+
+h4("Chosen level:")
+verbatimTextOutput("olevel")
+output$olevel = renderText({input$level})
 ```
 
 Column {data-width=600}
@@ -38,18 +46,31 @@ Column {data-width=600}
 
 ```{r display composition}
 
-h4("Chosen type:")
-verbatimTextOutput("otype")
-h4("Chosen level:")
-verbatimTextOutput("olevel")
 
-output$otype = renderText({input$type})
-output$olevel = renderText({input$level})
+
+t = reactive({as.numeric(input$type)})
+l = reactive({as.numeric(input$level)})
+
+#$otype = renderText({input$type})
+#output$olevel = renderText({input$level})
+
+
 
 # Read in chosen Kirby data
-library(magrittr); library(dplyr); library(MRIcloudT1volumetrics) 
+library(magrittr); library(dplyr); library(MRIcloudT1volumetrics); library(ggplot2)
 ## Change this to where the data directory is
 dat = readSubject("/Users/gracewindheim/Documents/gmwDataSci/hw4temp/kirby_3_1_ax_283Labels_M2_corrected_stats.txt")
+dat = subject2df(dat)
+tl = reactive({
+  filter(dat, type == t(), level == l())
+  })
+
+
+plotOutput("plot1")
+output$plot1 = renderPlot({
+  p = ggplot(tl(), aes(x=roi, y=volume)) + geom_col()
+})
+
 
 # Find the composition
 

@@ -13,10 +13,15 @@ shinyUI(fluidPage(
   # Sidebar with areas for weight and height input 
   sidebarLayout(
     sidebarPanel(
-      numericInput('height', 'Numeric input, labeled id1', 0, min = 0, max = 10, step = 1),
-      checkboxGroupInput("hunits", "Height Units",
+      
+      numericInput('height', 'What is your height?', 0, min = 0, step = 1),
+      radioButtons("hunits", "Height Units",
                          c("Feet" = "1",
-                           "Meters" = "2"))
+                           "Meters" = "m")),
+      numericInput('weight', 'What is your weight?', 0, min = 0, step = 1),
+      radioButtons("wunits", "Weight Units",
+                   c("Pounds" = "lb",
+                     "Kilograms" = "kg"))
       ),
     
     # Show a plot of the generated distribution
