@@ -1,0 +1,77 @@
+---
+title: "Question 4: Kirby21 Data"
+output: 
+  flexdashboard::flex_dashboard:
+    orientation: columns
+    vertical_layout: fill
+    
+runtime: shiny
+---
+
+```{r setup, include=FALSE}
+library(flexdashboard)
+```
+
+Column {data-width=400}
+-----------------------------------------------------------------------
+
+### Select data
+
+```{r select data}
+
+# User selects type (1-3) and level (1-5)
+radioButtons("type", "Choose type:",
+               c("Type 1" = "1",
+                 "Type 2" = "2"))
+
+radioButtons("level", "Choose level:",
+               c("Level 1" = "1",
+                 "Level 2" = "2",
+                 "Level 3" = "3"))
+
+```
+
+Column {data-width=600}
+-----------------------------------------------------------------------
+
+### Plot of Average Composition
+
+```{r display composition}
+
+h4("Chosen type:")
+verbatimTextOutput("otype")
+h4("Chosen level:")
+verbatimTextOutput("olevel")
+
+output$otype = renderText({input$type})
+output$olevel = renderText({input$level})
+
+# Read in chosen Kirby data
+library(magrittr); library(dplyr); library(MRIcloudT1volumetrics) 
+## Change this to where the data directory is
+dat = readSubject("/Users/gracewindheim/Documents/gmwDataSci/hw4temp/kirby_3_1_ax_283Labels_M2_corrected_stats.txt")
+
+# Find the composition
+
+# Make plotly of the composition
+library(plotly)
+
+
+```
+
+### Chart C
+
+```{r}
+plotlyOutput("compPlot")
+
+library(plotly)
+
+output$compPlot = renderPlotly({
+  fig = plot_ly(
+  x = c("giraffes", "orangutans", "monkeys"),
+  y = c(20, 14, 23),
+  name = "SF Zoo",
+  type = 'bar')
+  })
+```
+

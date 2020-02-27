@@ -9,7 +9,7 @@ Recreating the plots from homework 3 using Plotly.
 knitr::opts_chunk$set(echo = TRUE)
 ```
 
-Read in libraries
+Read in plotly library
 ```{r}
 library(plotly)
 ```
