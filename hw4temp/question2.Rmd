@@ -1,0 +1,69 @@
+---
+title: "Question 2: Plotly graphics"
+output: html_document
+---
+
+Recreating the plots from homework 3 using Plotly.
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+Read in libraries
+```{r}
+library(plotly)
+```
+
+## Plot 1 - Year Bar Chart
+```{r year plot, echo=FALSE}
+#library(ggplot2)
+#classdat = read.csv("/cloud/project/assignment-3-gracewindheim/classInterests.txt", sep="\t", header=TRUE, stringsAsFactor=FALSE)
+classdat = read.csv("/Users/gracewindheim/Documents/College/Academics/Spring 2020/assignment-3-gracewindheim/classInterests.txt", sep="\t", header=TRUE, stringsAsFactor=FALSE)
+y = data.frame(table(classdat$Year))
+colnames(y) = c("Year", "Count")
+
+yplot = ggplot(data=y, aes(x=Year, y=Count)) + geom_col()
+yplot = ggplotly(yplot)
+yplot
+
+```
+
+## Plot 2 - Program Bar Chart
+```{r program plot, echo=FALSE}
+p = data.frame(table(classdat$Program))
+colnames(p) = c("Program", "Count")
+
+pplot = ggplot(data=p, aes(x=Program, y=Count)) + geom_col()
+pplot = ggplotly(pplot)
+pplot
+```
+
+## Plot 3 - Healthcare Plot
+```{r healthcare plot, echo=FALSE}
+#healthdat = read.csv("/cloud/project/assignment-3-gracewindheim/healthcare-spending.csv", header = TRUE, sep = ",", quote = "\"", skip = 2, stringsAsFactors = FALSE)
+healthdat = read.csv("/Users/gracewindheim/Documents/College/Academics/Spring 2020/assignment-3-gracewindheim/healthcare-spending.csv", header = TRUE, sep = ",", quote = "\"", skip = 2, stringsAsFactors = FALSE)
+healthdat = healthdat[-c(1, 53:61),] #Without US total spending
+h = data.frame(healthdat)
+colnames(h) = c("Location", "1991":"2014")
+library(tidyr)
+hg = gather(h, Year, Spending, "1991":"2014") 
+library(ggplot2)
+hplot = ggplot(hg, aes(Year, Spending, colour=Location)) + geom_point() + theme(axis.text.x = element_text(angle = 90, hjust = 1))
+
+
+hplot = ggplotly(hplot)
+hplot
+```
+
+## Plot 4 - Healthcare Bar Chart
+```{r healthcare bar, echo=FALSE}
+library(dplyr)
+final = hg %>% group_by(Location) %>% summarise(AvgSpending = mean(Spending))
+
+#barplot
+splot = ggplot(data=final, aes(x=Location, y=AvgSpending)) + geom_col() + theme(axis.text.x = element_text(angle = 60, hjust = 1))
+
+splot = ggplotly(splot)
+splot
+```
+
