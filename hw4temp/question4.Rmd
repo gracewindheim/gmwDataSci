@@ -20,23 +20,32 @@ Column {data-width=400}
 ```{r select data}
 
 # User selects type (1-3) and level (1-5)
-radioButtons("type", "Choose type:",
-               c("Type 1" = "1",
-                 "Type 2" = "2"))
+selectInput("type", "Type:",
+                c("1" = "1",
+                  "2" = "2"))
 
-radioButtons("level", "Choose level:",
-               c("Level 1" = "1",
-                 "Level 2" = "2",
-                 "Level 3" = "3"))
+selectInput("level", "Level:",
+                c("1" = "1",
+                  "2" = "2",
+                  "3" = "3"))
+
+# radioButtons("type", "Choose type:",
+#                c("Type 1" = "1",
+#                  "Type 2" = "2"))
+# 
+# radioButtons("level", "Choose level:",
+#                c("Level 1" = "1",
+#                  "Level 2" = "2",
+#                  "Level 3" = "3"))
 
 h4("Chosen type:")
-verbatimTextOutput("otype")
-output$otype = renderText({input$type})
+#verbatimTextOutput("otype")
+renderText({input$type})
 
 
 h4("Chosen level:")
-verbatimTextOutput("olevel")
-output$olevel = renderText({input$level})
+#verbatimTextOutput("olevel")
+renderText({input$level})
 ```
 
 Column {data-width=600}
@@ -46,29 +55,28 @@ Column {data-width=600}
 
 ```{r display composition}
 
-
-
-t = reactive({as.numeric(input$type)})
-l = reactive({as.numeric(input$level)})
-
-#$otype = renderText({input$type})
-#output$olevel = renderText({input$level})
-
-
-
 # Read in chosen Kirby data
 library(magrittr); library(dplyr); library(MRIcloudT1volumetrics); library(ggplot2)
 ## Change this to where the data directory is
 dat = readSubject("/Users/gracewindheim/Documents/gmwDataSci/hw4temp/kirby_3_1_ax_283Labels_M2_corrected_stats.txt")
 dat = subject2df(dat)
-tl = reactive({
-  filter(dat, type == t(), level == l())
-  })
+
+#### CREATE PLOT ####
+
+#t = reactive({as.numeric(input$type)})
+#l = reactive({as.numeric(input$level)})
+
+#x = reactive({filter(dat, type == input$type, level == input$level)})
+#x = data.frame(x)
+
+# tl = reactive({
+#   filter(dat, type == t(), level == l())
+#   })
 
 
-plotOutput("plot1")
-output$plot1 = renderPlot({
-  p = ggplot(tl(), aes(x=roi, y=volume)) + geom_col()
+#plotOutput("plot1")
+renderPlot({
+  dat %>% filter(type == input$type, level == input$level) %>% ggplot(aes(x=roi, y=volume)) + geom_col()
 })
 
 
@@ -83,11 +91,11 @@ library(plotly)
 ### Chart C
 
 ```{r}
-plotlyOutput("compPlot")
+#plotlyOutput("compPlot")
 
 library(plotly)
 
-output$compPlot = renderPlotly({
+renderPlotly({
   fig = plot_ly(
   x = c("giraffes", "orangutans", "monkeys"),
   y = c(20, 14, 23),
