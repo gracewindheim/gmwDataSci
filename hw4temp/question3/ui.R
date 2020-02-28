@@ -16,7 +16,7 @@ shinyUI(fluidPage(
       
       numericInput('height', 'What is your height?', 0, min = 0, step = 1),
       radioButtons("hunits", "Height Units",
-                         c("Feet" = "1",
+                         c("Feet" = "ft",
                            "Meters" = "m")),
       numericInput('weight', 'What is your weight?', 0, min = 0, step = 1),
       radioButtons("wunits", "Weight Units",
@@ -24,7 +24,7 @@ shinyUI(fluidPage(
                      "Kilograms" = "kg"))
       ),
     
-    # Show a plot of the generated distribution
+    # Print calculated BMI
     mainPanel(
       h4('Your BMI is'),
       verbatimTextOutput("bmi")
