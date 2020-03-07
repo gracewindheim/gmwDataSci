@@ -1,0 +1,66 @@
+---
+title: "Untitled"
+output: 
+  flexdashboard::flex_dashboard:
+    orientation: columns
+    vertical_layout: fill
+---
+
+```{r setup, include=FALSE}
+library(flexdashboard); library(gtrendsR); library(plotly); library(dplyr)
+```
+
+Column {data-width=650}
+-----------------------------------------------------------------------
+
+### Chart A
+
+```{r google trends}
+
+# Gather trends data. Interactive: Substitute "flu" with user's search term
+x = gtrends(c("coronavirus", "flu"), time = "today 3-m") # last hour
+
+# Interest over time
+plot(x)
+
+# Related topics
+related = x$related_topics
+plot_ly(x$related_topics, x = ~value, y = ~subject, type = 'bar')
+
+# Related queries
+queries = x$related_queries %>% filter(subject >= 0)
+queries$subject = as.numeric(queries$subject)
+
+queries$value <- factor(queries$value, levels = unique(queries$value)[order(queries$subject, decreasing = FALSE)])
+
+plot_ly(queries, x = ~subject, y = ~value, type = 'bar')
+
+# Rising popularity
+rising = x$related_queries %>% filter(!(subject >= 0))
+rising$subject = as.numeric(rising$subject)
+
+rising$value <- factor(rising$value, levels = unique(rising$value)[order(rising$subject, decreasing = FALSE)])
+
+plot_ly(rising, x = ~subject, y = ~value, type = 'bar')
+
+```
+
+Column {data-width=350}
+-----------------------------------------------------------------------
+
+### Chart B
+
+```{r}
+
+# Interactive element: choosing to compare "coronavirus" search term to another word
+
+# Choosing time frame of search
+
+```
+
+### Chart C
+
+```{r}
+
+```
+
