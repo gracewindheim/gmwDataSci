@@ -4,63 +4,90 @@ output:
   flexdashboard::flex_dashboard:
     orientation: columns
     vertical_layout: fill
+    runtime: shiny
 ---
 
 ```{r setup, include=FALSE}
 library(flexdashboard); library(gtrendsR); library(plotly); library(dplyr)
 ```
 
-Column {data-width=650}
+Column {data-width=500}
 -----------------------------------------------------------------------
+
+Times:
+
+"now 1-H" Last hour
+"now 4-H" Last four hours
+"now 1-d" Last day
+"now 7-d" Last seven days
+"today 1-m" Past 30 days
+"today 3-m" Past 90 days
+"today 12-m" Past 12 months
+"today+5-y" Last five years (default)
+"all" Since the beginning of Google Trends (2004)
+
 
 ### Chart A
 
 ```{r google trends}
 
+textInput("search", "Search term:", value = "flu")
+
+selectInput("time", "Time range: ",
+                c("Past hour" = "now 1-H",
+                  "Past day"= "now 1-d",
+                  "Past 7 days" = "now 7-d"
+                  ), selected = "Past hour")
+
 # Gather trends data. Interactive: Substitute "flu" with user's search term
-x = gtrends(c("coronavirus", "flu"), time = "today 3-m") # last hour
+x = gtrends("coronavirus", time = "today 3-m") # last hour
+#plot(x)
 
-# Interest over time
-plot(x)
-
-# Related topics
-related = x$related_topics
-plot_ly(x$related_topics, x = ~value, y = ~subject, type = 'bar')
-
-# Related queries
-queries = x$related_queries %>% filter(subject >= 0)
-queries$subject = as.numeric(queries$subject)
-
-queries$value <- factor(queries$value, levels = unique(queries$value)[order(queries$subject, decreasing = FALSE)])
-
-plot_ly(queries, x = ~subject, y = ~value, type = 'bar')
-
-# Rising popularity
-rising = x$related_queries %>% filter(!(subject >= 0))
-rising$subject = as.numeric(rising$subject)
-
-rising$value <- factor(rising$value, levels = unique(rising$value)[order(rising$subject, decreasing = FALSE)])
-
-plot_ly(rising, x = ~subject, y = ~value, type = 'bar')
-
+renderPlotly({
+  y = gtrends(c("coronavirus", input$search), time = input$time) # last hour
+  plot(y)
+})
 ```
 
-Column {data-width=350}
+Column {data-width=500}
 -----------------------------------------------------------------------
 
-### Chart B
+### Related topics
 
 ```{r}
+x = gtrends("coronavirus", time = "today 3-m") # last hour
 
-# Interactive element: choosing to compare "coronavirus" search term to another word
 
-# Choosing time frame of search
+# Related topics
+renderPlotly({
+  
+  related = x$related_topics %>% filter(subject > 0) # need to only take numbers
+  related$subject = as.numeric(related$subject)
+  related = na.omit(related)
+  
+  related$value <- factor(related$value, levels = unique(related$value)[order(related$subject, decreasing = FALSE)]) # order
+
+  plot_ly(related, x = ~subject, y = ~value, type = 'bar') 
+
+  })
+
 
 ```
 
-### Chart C
+### Related queries
 
 ```{r}
+# Related queries
+renderPlotly({
+  queries = x$related_queries %>% filter(subject >= 0)
+  queries$subject = as.numeric(queries$subject) # make number
+  
+  queries$value <- factor(queries$value, levels = unique(queries$value)[order(queries$subject, decreasing = FALSE)]) # order
+  
+  plot_ly(queries, x = ~subject, y = ~value, type = 'bar', name = "Related queries", marker = list(color = '#9119b8')) 
+    
+})
+
 
 ```
 
