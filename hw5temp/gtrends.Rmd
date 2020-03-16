@@ -1,5 +1,5 @@
 ---
-title: "Coronavirus Google Trends"
+title: "Coronavirus Google Trends Tracker"
 output: 
   flexdashboard::flex_dashboard:
     orientation: rows
@@ -14,12 +14,13 @@ library(flexdashboard); library(gtrendsR); library(plotly); library(dplyr)
 Inputs {.sidebar}
 -------------------------------------
 
+Compare Google search results for "coronavirus" to:
 ```{r}
 # see coronavirus search alone
 
-textInput("search", "Search term:", value = "flu")
+textInput("search", "Search term:", value = "virus")
 
-selectInput("time", "Time range: ",
+selectInput("time", "in the past: ",
                 c("Past hour" = "now 1-H",
                   "Past day"= "now 1-d",
                   "Past 7 days" = "now 7-d",
@@ -29,7 +30,17 @@ selectInput("time", "Time range: ",
                   "Past 5 years" = "today+5-y"
                   ), selected = "Past hour")
 
-submitButton("Update")
+selectInput("source", "from: ",
+            c("all web" = "web",
+              "news" = "news",
+              "YouTube" = "youtube",
+              "images" = "images",
+              "Froogle" = "froogle"
+            )
+  
+)
+
+submitButton("Update") # NEED TO FIX
 
 ```
  
@@ -37,60 +48,36 @@ submitButton("Update")
 Row
 -----------------------------------------------------------------------
 
-### Interest over time - Coron
+### Interest over time
 
 ```{r comparison}
 
-
 renderPlotly({
-  if (is.null(input$search)) {
-    y = gtrends("coronavirus", time = input$time)
-  } else {
-    y = gtrends(c("coronavirus", input$search), time = input$time)
-  }
+  y = gtrends(c("coronavirus", input$search), time = input$time, gprop = input$source)
   plot(y)
 })
+
 ```
 
-Row {.tabset .tabset-fade}
+Row
 -----------------------------------------------------------------------
-
-### Related topics
-
-```{r related topics}
-x = gtrends("coronavirus", time = "today 3-m") # last hour
-
-
-# Related topics
-renderPlotly({
-  
-  related = x$related_topics %>% filter(subject > 0) # need to only take numbers
-  related$subject = as.numeric(related$subject)
-  related = na.omit(related)
-  
-  related$value <- factor(related$value, levels = unique(related$value)[order(related$subject, decreasing = FALSE)]) # order
-
-  plot_ly(related, x = ~subject, y = ~value, type = 'bar') 
-
-  })
-
-
-```
 
 ### Related queries
 
 ```{r related queries}
 # Related queries
 renderPlotly({
-  queries = x$related_queries %>% filter(subject >= 0)
+  x = gtrends("coronavirus", time = input$time, gprop = input$source)
+  
+  queries = x$related_queries %>% filter(subject >= 1)
   queries$subject = as.numeric(queries$subject) # make number
+  queries = na.omit(queries)
   
   queries$value <- factor(queries$value, levels = unique(queries$value)[order(queries$subject, decreasing = FALSE)]) # order
   
   plot_ly(queries, x = ~subject, y = ~value, type = 'bar', name = "Related queries", marker = list(color = '#9119b8')) 
     
 })
-
 
 ```
 
