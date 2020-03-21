@@ -14,11 +14,16 @@ library(flexdashboard); library(gtrendsR); library(plotly); library(dplyr)
 Inputs {.sidebar}
 -------------------------------------
 
-DISCLAIMER: This was created as part of a class project and should not be used as official health information.
+_DISCLAIMER: This was created as part of a class project and should not be used as official health information._
+
+Use this app to see how popular the search term **coronavirus** has been over time and what related queries are being searched for on Google. Use the options below to compare the performance to another search term, change the time frame, or change source of the data.
+
+Data is sourced from Google and retrieved through the gtrendsR package. Information last updated March 21, 2020.
+
 ```{r}
 
 # see coronavirus search alone or compare to another query
-radioButtons("view", "See the number of hits for the search term 'coronavirus' ",
+radioButtons("view", h2("See interest over time for 'coronavirus'..."),
                        c("by itself" = "1",
                          "compared to: " = "2"),
                  selected = "2")
@@ -32,7 +37,7 @@ selectInput("time", "Show results from the: ",
                   "Past 90 days" = "today 3-m",
                   "Past 12 months" = "today 12-m",
                   "Past 5 years" = "today+5-y"
-                  ), selected = "Past 30 days")
+                  ), selected = "now 1-d")
 
 selectInput("source", "Source results from: ",
             c("All web" = "web",
