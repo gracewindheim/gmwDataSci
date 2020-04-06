@@ -1,0 +1,34 @@
+---
+title: "HW7 Answers"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+## Question 1
+
+Use squared error loss (a linear model) and the variables waist, age, sex and bmi to predict log(rdi4p + 1). Interpet the coefficients.
+```{r cars}
+dat = read.csv("shhs1.txt", header=T, sep="\t")
+
+# using waist, age, sex, bmi to predict log(rdi4p + 1)
+x = dat$bmi_s1
+y = log(dat$rdi4p + 1)
+```
+
+## Question 2
+
+Define sleep disordered breathing as having an rdi4p greater than 15. Use logistic regression to fit a model on having sleep disordered breathing using waist, age, sex and bmi as predictors. Interpret your coefficients.
+```{r}
+
+```
+
+## Question 3
+Use a logistic regresion model to predict HTNDerv_S1 using age, sex, bmi and rdi4p. Interpret the rdi4p coefficient.
+```{r}
+
+```
+
+

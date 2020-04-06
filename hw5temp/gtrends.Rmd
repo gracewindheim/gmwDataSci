@@ -11,7 +11,7 @@ output:
 library(flexdashboard); library(gtrendsR); library(plotly); library(dplyr)
 ```
 
-Inputs {.sidebar}
+Sidebar {.sidebar}
 -------------------------------------
 
 _DISCLAIMER: This was created as part of a class project and should not be used as official health information._
