@@ -5,6 +5,8 @@ output: html_document
 
 ```{r setup, include=FALSE}
 knitr::opts_chunk$set(echo = TRUE)
+
+library(dplyr); library(glmnet)
 ```
 
 ## Question 1
@@ -18,26 +20,86 @@ y = log(dat$rdi4p + 1)
 
 summary(lm(y ~ waist + age_s1 + gender + bmi_s1, data = dat))
 ```
-Intercept = 
-Waist coefficient = 
-Age coefficient = 
-Gender coefficient = 
-BMI coefficient = 
+Intercept = log(rdi4p) is -2.28 if the person is female and has variables of waist, age, and BMI that are 0.
+
+Waist coefficient = there is a 0.007 increase in log(rdi4p) for every one unit increase in waist holding remaining variables constant.
+
+Age coefficient = there is a 0.02 increase in log(rdi4p) for every one year increase in age holding remaining variables constant.
+
+Gender coefficient = there is a 0.518 increase in log(rdi4p) for males compared to females holding remaining variables constant.
+
+BMI coefficient = there is a 0.063 increase in log(rdi4p) for every one unit increase in BMI.
 
 
 ## Question 2
 
 Define sleep disordered breathing as having an rdi4p greater than 15. Use logistic regression to fit a model on having sleep disordered breathing using waist, age, sex and bmi as predictors. Interpret your coefficients.
+
 ```{r logit 15}
+# check for NA values
+#sapply(dat,function(x) sum(is.na(x)))
+
+logDat = dat
+logDat = logDat %>% mutate(sdb = case_when(rdi4p > 15 ~ 1, rdi4p <= 15 ~ 0, TRUE ~ NA_real_))
+
+# waist, age, sex, bmi as predictors
+fit = glm(sdb ~ waist + age_s1 + gender + bmi_s1, family = binomial(link = 'logit'), data = logDat)
+summary(fit)
 
 ```
+Intercept = -9.12
+Waist coefficient = 0.019
+Age coefficient = 0.033
+Gender coefficient = 1.05
+BMI coefficient = 0.103
 
 
 ## Question 3
 
 Use a logistic regresion model to predict HTNDerv_S1 using age, sex, bmi and rdi4p. Interpret the rdi4p coefficient.
+
 ```{r logit HTNDerv}
 
+fit3 = glm(HTNDerv_s1 ~ age_s1 + gender + bmi_s1 + rdi4p, family = binomial(link = 'logit'), data = dat)
+summary(fit3)
 ```
+
+rdi4p coefficient = 
+
+
+## Question 4
+
+Redo your fit to question 1 using a lasso penalty. Attach a plot of the coefficients as the penalty varies.
+```{r lasso}
+
+# using waist, age, sex, bmi to predict log(rdi4p + 1)
+y = log(dat$rdi4p + 1)
+
+summary(lm(y ~ waist + age_s1 + gender + bmi_s1, data = dat))
+
+```
+
+
+## Question 5
+
+Redo your fit to question 1 using a ridge peanlty. Attach a plot of the coefficients as the penalty varies.
+```{r ridge}
+
+```
+
+## Question 6
+
+Redo your fit to question 1 using an elastic net penalty. Attach a plot of the coefficients as the penalty varies.
+```{r elastic }
+
+```
+
+## Question 7
+
+Split your data into 25% testing and 75% training. Train your model from questions 1 to predict log(rdi4p + 1) using an elastic net, neural network and no penalty. Compare the test set mean squared error on the three.
+```{r training}
+
+```
+
 
 
