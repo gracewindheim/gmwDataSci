@@ -47,10 +47,14 @@ fit = glm(sdb ~ waist + age_s1 + gender + bmi_s1, family = binomial(link = 'logi
 summary(fit)
 
 ```
-Intercept = -9.12
+Intercept = -9.12 is the log odds when the all regressors are 0.
+
 Waist coefficient = 0.019
+
 Age coefficient = 0.033
+
 Gender coefficient = 1.05
+
 BMI coefficient = 0.103
 
 
@@ -69,35 +73,57 @@ rdi4p coefficient =
 
 ## Question 4
 
-Redo your fit to question 1 using a lasso penalty. Attach a plot of the coefficients as the penalty varies.
+Redo your fit to question 1 using a lasso penalty. Attach a plot of the coefficients as the L1 sum of the parameters varies.
 ```{r lasso}
 
 # using waist, age, sex, bmi to predict log(rdi4p + 1)
-y = log(dat$rdi4p + 1)
+penaltyDat = dat
+penaltyDat = na.omit(penaltyDat)
 
-summary(lm(y ~ waist + age_s1 + gender + bmi_s1, data = dat))
+x = penaltyDat %>% select(waist, age_s1, gender, bmi_s1) %>% as.matrix()
+y = log(penaltyDat$rdi4p + 1)
+
+## fit with our selected lambda
+plot(glmnet(x, y, alpha = 1))
+
+## pick the lasso parameter using cv
+cvL = cv.glmnet(x, y, alpha = 1, 
+                lambda = seq(0, exp(-3), length = 100))
+
+plot(cvL)
+
+newx  = x[1 : 5,]
+predict(cvL, newx = newx, lambda = "lambda.1se")
+
 
 ```
 
 
 ## Question 5
 
-Redo your fit to question 1 using a ridge peanlty. Attach a plot of the coefficients as the penalty varies.
+Redo your fit to question 1 using a ridge peanlty. Attach a plot of the coefficients as the L1 sum of the parameters varies.
 ```{r ridge}
+
+#predict(cvR, newx = x, lambda = "lambda.minR")
+plot(glmnet(x, y, alpha = 0))
+
 
 ```
 
 ## Question 6
 
-Redo your fit to question 1 using an elastic net penalty. Attach a plot of the coefficients as the penalty varies.
+Redo your fit to question 1 using an elastic net penalty. Attach a plot of the coefficients as the L1 sum of the parameters varies.
 ```{r elastic }
+plot(glmnet(x, y, alpha = 0.2))
 
 ```
 
 ## Question 7
 
-Split your data into 25% testing and 75% training. Train your model from questions 1 to predict log(rdi4p + 1) using an elastic net, neural network and no penalty. Compare the test set mean squared error on the three.
+Train your model from questions 1 to predict log(rdi4p + 1) using an elastic net, lasso, ridge regression, and no penalty. Use cross validation to select the penalty. Compare the best cross validated error for each type (lasso, ridge, EL).
+
 ```{r training}
+plot(glmnet(x, y))
 
 ```
 
