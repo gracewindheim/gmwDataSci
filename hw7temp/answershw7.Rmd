@@ -84,17 +84,10 @@ x = penaltyDat %>% select(waist, age_s1, gender, bmi_s1) %>% as.matrix()
 y = log(penaltyDat$rdi4p + 1)
 
 ## fit with our selected lambda
-plot(glmnet(x, y, alpha = 1))
+plot(glmnet(x, y, alpha = 1), xlim = c(0.0, 0.02), main = "Lasso")
+#legend("bottomright", lwd = 1, col = 1:6, legend = colnames(x), cex = .7)
 
-## pick the lasso parameter using cv
-cvL = cv.glmnet(x, y, alpha = 1, 
-                lambda = seq(0, exp(-3), length = 100))
-
-plot(cvL)
-
-newx  = x[1 : 5,]
-predict(cvL, newx = newx, lambda = "lambda.1se")
-
+plot(glmnet(x, y, alpha = 1), xlim = c(0.0, 0.04), main = "Lasso")
 
 ```
 
@@ -105,8 +98,9 @@ Redo your fit to question 1 using a ridge peanlty. Attach a plot of the coeffici
 ```{r ridge}
 
 #predict(cvR, newx = x, lambda = "lambda.minR")
-plot(glmnet(x, y, alpha = 0))
+plot(glmnet(x, y, alpha = 0), xlim = c(0.0, 0.1), main = "Ridge")
 
+plot(glmnet(x, y, alpha = 0), xlim = c(0.0, 0.04), main = "Ridge")
 
 ```
 
@@ -114,7 +108,8 @@ plot(glmnet(x, y, alpha = 0))
 
 Redo your fit to question 1 using an elastic net penalty. Attach a plot of the coefficients as the L1 sum of the parameters varies.
 ```{r elastic }
-plot(glmnet(x, y, alpha = 0.2))
+plot(glmnet(x, y, alpha = 0.2), xlim = c(0.0, 0.1), main = "Elastic net")
+plot(glmnet(x, y, alpha = 0.2), xlim = c(0.0, 0.04), main = "Elastic net")
 
 ```
 
@@ -123,7 +118,25 @@ plot(glmnet(x, y, alpha = 0.2))
 Train your model from questions 1 to predict log(rdi4p + 1) using an elastic net, lasso, ridge regression, and no penalty. Use cross validation to select the penalty. Compare the best cross validated error for each type (lasso, ridge, EL).
 
 ```{r training}
-plot(glmnet(x, y))
+
+# alpha = 1 for lasso, = 0 for ridge, = 0.2 for elastic net
+
+## pick the lasso parameter using cv
+cvL = cv.glmnet(x, y, alpha = 1)
+plot(cvL)
+
+## pick the ridge parameter using cv
+cvR = cv.glmnet(x, y, alpha = 0)
+plot(cvR)
+
+## pick the elastic net parameter using cv
+cvEL = cv.glmnet(x, y, alpha = 0.2)
+plot(cvEL)
+
+
+cvL$lambda.1se
+cvR$lambda.1se
+cvEL$lambda.1se
 
 ```
 
