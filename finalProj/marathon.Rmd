@@ -1,0 +1,52 @@
+---
+title: "Marathon"
+output: 
+  flexdashboard::flex_dashboard:
+    orientation: columns
+    vertical_layout: fill
+---
+
+```{r setup, include=FALSE}
+library(flexdashboard); library(tidyverse)
+```
+
+Column {data-width=650}
+-----------------------------------------------------------------------
+
+### Chart A
+
+```{r}
+mar = read.csv("MarathonData.csv", header=T)
+head(mar)
+
+#remove outlier sp4week person
+arrange(mar, desc(sp4week))
+mar = filter(mar, id != 82)
+
+
+plot(x = mar$km4week, y = mar$MarathonTime)
+plot(x = mar$sp4week, y = mar$MarathonTime)
+plot(x = mar$km4week, y = mar$sp4week, col=mar$CATEGORY)
+
+
+
+y = mar$MarathonTime
+summary(lm(y ~ km4week + sp4week + Category, data = mar))
+
+```
+
+Column {data-width=350}
+-----------------------------------------------------------------------
+
+### Chart B
+
+```{r}
+
+```
+
+### Chart C
+
+```{r}
+
+```
+

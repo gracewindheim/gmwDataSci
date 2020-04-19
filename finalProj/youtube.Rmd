@@ -1,0 +1,45 @@
+---
+title: "Youtube stats"
+output: 
+  flexdashboard::flex_dashboard:
+    orientation: columns
+    vertical_layout: fill
+---
+
+```{r setup, include=FALSE}
+library(flexdashboard)
+```
+
+Column {data-width=650}
+-----------------------------------------------------------------------
+
+### Chart A
+
+```{r}
+dat = read.csv("USvideos_modified.csv", header=T)
+head(dat)
+
+plot(x = log(dat$views), y = dat$trend_day_count) #views
+plot(x = log(dat$comment_count), y = dat$trend_day_count) #comments
+plot(x = log(dat$likes/dat$dislikes), y = dat$subscriber) #L:DL ratio
+
+y = dat$trend_day_count
+summary(lm(y ~ likes + dislikes + views + subscriber + comment_count, data = dat))
+
+```
+
+Column {data-width=350}
+-----------------------------------------------------------------------
+
+### Chart B
+
+```{r}
+
+```
+
+### Chart C
+
+```{r}
+
+```
+
