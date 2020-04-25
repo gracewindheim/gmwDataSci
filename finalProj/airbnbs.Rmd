@@ -1,0 +1,64 @@
+---
+title: "Seattle Airbnbs"
+output: 
+  flexdashboard::flex_dashboard:
+    orientation: columns
+    vertical_layout: fill
+---
+
+```{r setup, include=FALSE}
+library(flexdashboard); library(tidyverse)
+```
+
+Column {data-width=650}
+-----------------------------------------------------------------------
+
+### Chart A
+
+```{r}
+orig = read.csv("listingsrefined.csv", header=T)
+head(orig)
+
+airpre = select(orig, price, room_type, bathrooms, bedrooms, accommodates, reviews_per_month, host_is_superhost)
+
+air = na.omit(airpre)
+
+plot(x = air$reviews_per_month, y = air$price)
+plot(x = air$bathrooms, y = air$price)
+plot(x = air$room_type, y = air$price)
+
+
+y = air$price
+summary(glm(y ~ room_type + bathrooms + bedrooms + accommodates + reviews_per_month + host_is_superhost, data = air))
+
+```
+
+Column {data-width=350}
+-----------------------------------------------------------------------
+
+### Chart B
+
+```{r traintest}
+
+# Create Training and Test data -
+set.seed(100)  # setting seed to reproduce results of random sampling
+trainingRowIndex <- sample(1:nrow(air), 0.8*nrow(air))  # row indices for training data
+trainingData <- air[trainingRowIndex, ]  # model training data
+testData  <- air[-trainingRowIndex, ]   # test data
+
+# Build the model on training data
+lmMod <- glm(price ~ host_is_superhost + room_type + bathrooms + bedrooms + accommodates + reviews_per_month, data=trainingData)  # build the model
+pricePred <- predict(lmMod, testData)  # predict distance
+summary(lmMod)
+
+actuals_preds <- data.frame(cbind(actuals=testData$price, predicteds=pricePred))  # make actuals_predicteds dataframe.
+correlation_accuracy <- cor(actuals_preds)  # 67.6%
+head(actuals_preds)
+correlation_accuracy
+```
+
+### Chart C
+
+```{r}
+
+```
