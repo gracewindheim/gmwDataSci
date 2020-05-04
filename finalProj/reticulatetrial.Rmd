@@ -1,0 +1,44 @@
+---
+title: "Untitled"
+output: 
+  flexdashboard::flex_dashboard:
+    orientation: columns
+    vertical_layout: fill
+---
+
+```{r setup, include=FALSE}
+library(flexdashboard); library(reticulate)
+```
+
+Column {data-width=650}
+-----------------------------------------------------------------------
+
+### Chart A
+
+```{python}
+import pandas as pd
+
+! if [ ! -e oasis.csv ]; \
+then wget https://raw.githubusercontent.com/gracewindheim/gmwDataSci/master/shhs1.txt; \
+fi;
+
+## Read in the data and display a few rows
+dat = pd.read_csv("shhs1.txt", sep = "\t")
+dat = dat.dropna()
+```
+
+Column {data-width=350}
+-----------------------------------------------------------------------
+
+### Chart B
+
+```{r}
+
+```
+
+### Chart C
+
+```{r}
+
+```
+
