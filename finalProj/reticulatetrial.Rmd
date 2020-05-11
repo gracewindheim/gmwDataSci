@@ -17,14 +17,26 @@ Column {data-width=650}
 
 ```{python}
 import pandas as pd
+import numpy as np
+```
 
-! if [ ! -e oasis.csv ]; \
-then wget https://raw.githubusercontent.com/gracewindheim/gmwDataSci/master/shhs1.txt; \
-fi;
+
+```{python}
 
 ## Read in the data and display a few rows
-dat = pd.read_csv("shhs1.txt", sep = "\t")
+pyair = pd.read_csv("listingsrefined.csv", sep=",")
+#pyair = pyair.dropna()
+#pyair.head(5)
+
+# isolate x and y variables
+dat = pyair[['room_type'] + ['accommodates'] + ['bathrooms'] + ['bedrooms'] + ['host_is_superhost'] + ['reviews_per_month'] + ['price']]
 dat = dat.dropna()
+#dat.head(10)
+# Create binary variable that assigns number for room_type and host_is_superhost variables
+
+dat['host_is_superhost'] = np.where(dat['host_is_superhost'] == "t", 1, 0)
+
+dat.head(10)
 ```
 
 Column {data-width=350}
@@ -33,7 +45,7 @@ Column {data-width=350}
 ### Chart B
 
 ```{r}
-
+pyair.
 ```
 
 ### Chart C

@@ -1,9 +1,10 @@
 ---
-title: "Seattle Airbnbs"
+title: "Shiny App"
 output: 
   flexdashboard::flex_dashboard:
     orientation: columns
     vertical_layout: fill
+runtime: shiny
 ---
 
 ```{r setup, include=FALSE}
@@ -17,55 +18,26 @@ Column {data-width=650}
 
 ```{r}
 orig = read.csv("listingsrefined.csv", header=T)
-head(orig)
 
 airpre = select(orig, price, room_type, bathrooms, bedrooms, reviews_per_month, accommodates, host_is_superhost)
 
 air = na.omit(airpre)
+
+plot_ly(data = air, x = ~bedrooms, y = ~price, color = ~room_type) 
 ```
-
-```{r plots}
-plot_ly(data = air, x = ~bedrooms, y = ~price, color = ~room_type)
-plot_ly(data = air, x = ~bedrooms, y = ~price, color = ~host_is_superhost)
-plot_ly(data = air, x = ~reviews_per_month, y = ~price, color = ~host_is_superhost)
-
-
-plot_ly(data = air, x = ~accommodates, y = ~price, type = 'scatter',
-  mode = 'markers', symbol = ~room_type, symbols = c('circle','x','o'),
-  color = ~room_type, marker = list(size = 10))
-
-avgRoom = air %>%
-  group_by(room_type) %>%
-  summarise(mean = mean(price), n = n())
-
-plot_ly(data = avgRoom, x = ~room_type, y = ~mean)
-```
-
-```{r model}
-y = air$price
-summary(glm(y ~ room_type + bathrooms + bedrooms + accommodates + reviews_per_month + host_is_superhost, data = air))
-
-```
-
 
 Column {data-width=350}
 -----------------------------------------------------------------------
 
 ### Chart B
 
-```{r traintest}
+```{r}
 # Create Training and Test data -
 set.seed(100)  # setting seed to reproduce results of random sampling
 trainingRowIndex <- sample(1:nrow(air), 0.8*nrow(air))  # row indices for training data
 trainingData <- air[trainingRowIndex, ]  # model training data
 testData  <- air[-trainingRowIndex, ]   # test data
 
-head(testData)
-```
-
-
-```{r prediction}
-# Build the model on training data
 lmMod <- glm(price ~ host_is_superhost + room_type + bathrooms + bedrooms + accommodates + reviews_per_month, data=trainingData)  # build the model
 
 pricePred <- predict(lmMod, testData)  # predict price
@@ -74,26 +46,23 @@ pricePred <- predict(lmMod, testData)  # predict price
 actuals_preds <- data.frame(cbind(actuals = testData$price, predicteds = pricePred))  # make actuals_predicteds dataframe.
 correlation_accuracy <- cor(actuals_preds)  # 67.6%
 head(actuals_preds)
-correlation_accuracy
-
 ```
 
-```{r user predict}
+### Chart C
 
+```{r}
 # user input example
-host_is_superhost = 't'
-room_type = "Entire home/apt"
-bathrooms = 2
-bedrooms = 3
-accommodates = 4
-reviews_per_month = 5
+host_is_superhost = 'f'
+room_type = "Private room"
+bathrooms = 1
+bedrooms = 1
+accommodates = 2
+reviews_per_month = 6
 
 userInput = data.frame(host_is_superhost, room_type, bathrooms, bedrooms, accommodates, reviews_per_month)
-userInput
 
 userPred = predict(lmMod, userInput)
 userPred
-
 
 # actual vs. predicted y graph
 finalPlot = plot_ly(data = actuals_preds, x = ~actuals, y = ~predicteds)
@@ -112,13 +81,6 @@ hline <- function(y = 0, color = "blue") {
 }
 
 # add prediction from user input
-finalPlot %>% layout(shapes = list(hline(200)))
+finalPlot %>% layout(shapes = list(hline(userPred)))
 ```
 
-
-
-### Chart C
-
-```{r}
-
-```
