@@ -44,7 +44,13 @@ plot_ly(data = avgRoom, x = ~room_type, y = ~mean)
 ```{r model}
 y = air$price
 summary(glm(y ~ room_type + bathrooms + bedrooms + accommodates + reviews_per_month + host_is_superhost, data = air))
+```
 
+
+```{r lm model}
+
+y = air$price
+summary(lm(y ~ room_type + bathrooms + bedrooms + accommodates + reviews_per_month + host_is_superhost, data = air))
 ```
 
 
@@ -66,12 +72,12 @@ head(testData)
 
 ```{r prediction}
 # Build the model on training data
-lmMod <- glm(price ~ host_is_superhost + room_type + bathrooms + bedrooms + accommodates + reviews_per_month, data=trainingData)  # build the model
+lmMod <- lm(price ~ host_is_superhost + room_type + bathrooms + bedrooms + accommodates + reviews_per_month, data=trainingData)  # build the model
 
-pricePred <- predict(lmMod, testData)  # predict price
-#summary(lmMod)
+pricePred <- predict(lmMod, testData, interval = "predict")  # predict price
+output = data.frame(pricePred)
 
-actuals_preds <- data.frame(cbind(actuals = testData$price, predicteds = pricePred))  # make actuals_predicteds dataframe.
+actuals_preds <- data.frame(cbind(actuals = testData$price, predicteds = output$fit))  # make actuals_predicteds dataframe.
 correlation_accuracy <- cor(actuals_preds)  # 67.6%
 head(actuals_preds)
 correlation_accuracy
@@ -81,18 +87,20 @@ correlation_accuracy
 ```{r user predict}
 
 # user input example
-host_is_superhost = 't'
+host_is_superhost = 'f'
 room_type = "Entire home/apt"
 bathrooms = 2
-bedrooms = 3
-accommodates = 4
+bedrooms = 2
+accommodates = 3
 reviews_per_month = 5
+
+lmMod <- lm(price ~ host_is_superhost + room_type + bathrooms + bedrooms + accommodates + reviews_per_month, data=trainingData) 
 
 userInput = data.frame(host_is_superhost, room_type, bathrooms, bedrooms, accommodates, reviews_per_month)
 userInput
 
-userPred = predict(lmMod, userInput)
-userPred
+userPred = predict(lmMod, userInput, interval = "predict")
+lin = data.frame(userPred)
 
 
 # actual vs. predicted y graph
@@ -112,7 +120,7 @@ hline <- function(y = 0, color = "blue") {
 }
 
 # add prediction from user input
-finalPlot %>% layout(shapes = list(hline(200)))
+finalPlot %>% layout(shapes = list(hline(lin$fit)))
 ```
 
 

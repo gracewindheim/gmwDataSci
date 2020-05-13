@@ -2,12 +2,15 @@
 title: "Airbnb Prices"
 output: 
   flexdashboard::flex_dashboard:
+    theme: lumen
 runtime: shiny
+
 ---
 <style>                     
 .navbar-inverse {
     background-color: white;
     border-color: #FF5A5F;
+    color: #FF5A5F;
 }
 
 .navbar-inverse .navbar-brand {
@@ -17,8 +20,8 @@ runtime: shiny
 .navbar-inverse .navbar-nav {
   color: #FF5A5F;
 }
-</style>    
 
+</style>  
 
 ```{r setup, include=FALSE}
 library(flexdashboard); library(tidyverse); library(plotly)
@@ -27,9 +30,10 @@ library(flexdashboard); library(tidyverse); library(plotly)
 Predict
 ===================================== 
 
-Column {data-width=350}
+Sidebar {.sidebar}
 -------------------------------------
-Predict the nightly price of an Airbnb! This algorithm was trained on Seattle Airbnb data
+
+Predict the nightly price of an Airbnb listing that has the chosen features below. This algorithm uses multivariate linear regression and was trained on real Seattle Airbnb listings. 
 ```{r inputs}
 
 # Room_type
@@ -98,7 +102,6 @@ correlation_accuracy <- cor(actuals_preds)  # 67.6%
 
 ```{r plot}
 
-
 renderPlotly({
   
   # read in user input
@@ -114,10 +117,12 @@ renderPlotly({
   userPred = predict(lmMod, userInput)
   
   # actual vs. predicted y graph
-  finalPlot = plot_ly(data = actuals_preds, x = ~actuals, y = ~predicteds)
+  finalPlot = plot_ly(data = actuals_preds, x = ~actuals, y = ~predicteds) %>% layout(title = "Actual prices vs. algorithm predicted prices of Airbnb listings",
+         xaxis = list(title = "Actual listing price ($)"),
+         yaxis = list (title = "Algorithm predicted price ($)"))
   
   
-  hline <- function(y = 0, color = "blue") {
+  hline <- function(y = 0, color = "#FF5A5F") {
     list(
       type = "line", 
       x0 = 0, 
@@ -135,8 +140,7 @@ renderPlotly({
 })
 ```
 
-
-### Prediction {.value-box}
+### Predicted Airbnb nightly price, indicated on the graph by the red line {.value-box}
 ```{r}
 renderValueBox({
   host_is_superhost = input$host
@@ -149,11 +153,36 @@ renderValueBox({
   userInput = data.frame(host_is_superhost, room_type, bathrooms, bedrooms, accommodates, reviews_per_month)
   
   userPred = predict(lmMod, userInput)
-  prediction = paste('$', sprintf(userPred, fmt = '%#.2f'))
+  prediction = paste('$', ceiling(userPred))
   
   valueBox(
     value = prediction,
     icon = "fa-money",
+    color = "#FF5A5F"
+  )
+})
+```
+
+### 95% prediction interval (95% of Airbnb listings with the given featuers have a price that falls in this range) {.value-box}
+```{r}
+renderValueBox({
+  host_is_superhost = input$host
+  room_type = input$room
+  bathrooms = input$bathrooms
+  bedrooms = input$bedrooms
+  accommodates = input$accommodates
+  reviews_per_month = input$reviews
+  
+  userInput = data.frame(host_is_superhost, room_type, bathrooms, bedrooms, accommodates, reviews_per_month)
+  
+  userPred = predict(lm(price ~ host_is_superhost + room_type + bathrooms + bedrooms + accommodates + reviews_per_month, data=trainingData), userInput, interval = "predict")
+  outcome = data.frame(userPred)
+  lwr = paste('$', ceiling(outcome$lwr))
+  pi = paste(lwr, ceiling(outcome$upr), sep = '-')
+  
+  valueBox(
+    value = pi,
+    icon = "fa-signal",
     color = "primary"
   )
 })
@@ -162,27 +191,32 @@ renderValueBox({
 
 Visualize
 ===================================== 
+Explore the dataset and relationships of each predictor variable to the outcome variable of price. 
 
 Row {.tabset .tabset-fade}
 -------------------------------------
-### Bedrooms
+### Number of bedrooms
 ```{r}
-plot_ly(data = air, x = ~bedrooms, y = ~price, color = ~room_type) 
+plot_ly(data = air, x = ~bedrooms, y = ~price, color = ~room_type) %>% layout(xaxis = list(title = "Number of bedrooms"),
+         yaxis = list (title = "Listing price ($)"))
 ```
 
-### Bathrooms
+### Number of bathrooms
 ```{r}
-plot_ly(data = air, x = ~bathrooms, y = ~price, color = ~room_type) 
+plot_ly(data = air, x = ~bathrooms, y = ~price, color = ~room_type) %>% layout(xaxis = list(title = "Number of bathrooms"),
+         yaxis = list (title = "Listing price ($)"))
 ```
 
-### Accommodates
+### Number of guests
 ```{r}
-plot_ly(data = air, x = ~accommodates, y = ~price, color = ~room_type) 
+plot_ly(data = air, x = ~accommodates, y = ~price, color = ~room_type) %>% layout(xaxis = list(title = "Number of guests"),
+         yaxis = list (title = "Listing price ($)"))
 ```
 
-### Reviews
+### Reviews per month
 ```{r}
-plot_ly(data = air, x = ~reviews_per_month, y = ~price, color = ~host_is_superhost) 
+plot_ly(data = air, x = ~reviews_per_month, y = ~price, color = ~host_is_superhost) %>% layout(xaxis = list(title = "Reviews per month"),
+         yaxis = list (title = "Listing price ($)")) 
 ```
 
 ### Room type
@@ -191,18 +225,37 @@ avgRoom = air %>%
   group_by(room_type) %>%
   summarise(mean = mean(price), n = n())
 
-plot_ly(data = avgRoom, x = ~room_type, y = ~mean) 
+plot_ly(data = avgRoom, x = ~room_type, y = ~mean, marker = list(color = "#FF5A5F")) %>% layout(xaxis = list(title = "Listing type"),
+         yaxis = list (title = "Average price ($)"))
 ```
 
 
 Understand
 ===================================== 
 
-- what it's about
-- dataset info
-- algorithm explanation
-- linear regression formula
-- sample of actual vs. predicted numbers
+Column { vertical_layout: scroll}
+----------------------------------------------------------
+Created by Grace Windheim
+
+- This algorithm uses multivariate linear regression to model the relationship between features of Airbnb listings and their nightly price.
+- The data used is from [this dataset](http://insideairbnb.com/get-the-data.html) describing Airbnb listings in Seattle that was sourced from publicly available data on Airbnb's website. This dataset consists of 3815 listings
+- Six aspects of Airbnb listings were used as variables to predict the outcome of nightly price:
+1. Number of bedrooms
+2. Number of bathrooms
+3. Number of guests it accommodates
+4. Number of reviews the listing receives per month
+5. Room type - whether it's an entire house/apt, private room, or shared room
+6. Superhost status - whether the host has been designated by Airbnb as a ["Superhost"](https://www.airbnb.com/superhost), someone who is a top-rated and experienced host. 
+
+- The model was built using R's glm function. All coefficients are significant in the model as indicated by the '***' next to each factor:
+```{r}
+summary(glm(price ~ room_type + bathrooms + bedrooms + accommodates + reviews_per_month + host_is_superhost, data = air))
+
+```
+
+- The model was trained on 80% of the data and tested on the other 20% to yield the predicted prices for each listing. This algorithm had 67.6% accuracy. When plotting the actual prices vs. the algorithm's predicted prices as seen on the 'Predict' tab, we can see that the relationship is fairly linear, but deviates drastically as the listings become more expensive. This could be due to more expensive listings having other features that drive up their value which are not accounted for by the variables in this algorithm, such as location, interior design, or other amenities.
+
+- Below is an example of the actual listing prices vs. the algorithm's predicted prices:
 ```{r}
 head(actuals_preds)
 ```
