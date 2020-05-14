@@ -33,7 +33,7 @@ Predict
 Sidebar {.sidebar}
 -------------------------------------
 
-Predict the nightly price of an Airbnb listing that has the chosen features below. This algorithm uses multivariate linear regression and was trained on real Seattle Airbnb listings. 
+Adjust the sliders below to see what the predicted nightly price of an Airbnb listing with those features would be. This algorithm uses multivariate linear regression and was modelled on a dataset of real Seattle Airbnb listings from 2016. 
 ```{r inputs}
 
 # Room_type
@@ -61,7 +61,7 @@ sliderInput("bathrooms", "Number of bathrooms:",
 )
 
 # Accommodates
-sliderInput("accommodates", "Number of people it accommodates:",
+sliderInput("accommodates", "Number of guests it accommodates:",
             min = 1, max = 16, value = 3, step = 1
 )
 
@@ -96,7 +96,12 @@ pricePred <- predict(lmMod, testData)  # predict price
 #summary(lmMod)
 
 actuals_preds <- data.frame(cbind(actuals = testData$price, predicteds = pricePred))  # make actuals_predicteds dataframe.
+
 correlation_accuracy <- cor(actuals_preds)  # 67.6%
+min_max_accuracy <- mean(apply(actuals_preds, 1, min) / apply(actuals_preds, 1, max))  
+# => 77.6%, min_max accuracy
+mape <- mean(abs((actuals_preds$predicteds - actuals_preds$actuals))/actuals_preds$actuals)  
+# => 30.9%, mean absolute percentage error
 ```
 
 
@@ -153,7 +158,7 @@ renderValueBox({
   userInput = data.frame(host_is_superhost, room_type, bathrooms, bedrooms, accommodates, reviews_per_month)
   
   userPred = predict(lmMod, userInput)
-  prediction = paste('$', ceiling(userPred))
+  prediction = paste('$', ceiling(userPred), " per night")
   
   valueBox(
     value = prediction,
@@ -163,7 +168,7 @@ renderValueBox({
 })
 ```
 
-### 95% prediction interval (95% of Airbnb listings with the given featuers have a price that falls in this range) {.value-box}
+### Prediction interval: there is a 95% chance that the price of an Airbnb listing with the given features falls in this range {.value-box}
 ```{r}
 renderValueBox({
   host_is_superhost = input$host
@@ -178,7 +183,8 @@ renderValueBox({
   userPred = predict(lm(price ~ host_is_superhost + room_type + bathrooms + bedrooms + accommodates + reviews_per_month, data=trainingData), userInput, interval = "predict")
   outcome = data.frame(userPred)
   lwr = paste('$', ceiling(outcome$lwr))
-  pi = paste(lwr, ceiling(outcome$upr), sep = '-')
+  upr = paste(lwr, ceiling(outcome$upr), sep = '-')
+  pi = paste(upr, " per night")
   
   valueBox(
     value = pi,
@@ -215,7 +221,8 @@ plot_ly(data = air, x = ~accommodates, y = ~price, color = ~room_type) %>% layou
 
 ### Reviews per month
 ```{r}
-plot_ly(data = air, x = ~reviews_per_month, y = ~price, color = ~host_is_superhost) %>% layout(xaxis = list(title = "Reviews per month"),
+
+plot_ly(data = air, x = ~reviews_per_month, y = ~price, marker = list(color = "#FF5A5F")) %>% layout(xaxis = list(title = "Reviews per month"),
          yaxis = list (title = "Listing price ($)")) 
 ```
 

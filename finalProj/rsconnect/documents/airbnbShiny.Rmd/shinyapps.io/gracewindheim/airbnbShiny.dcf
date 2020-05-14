@@ -1,0 +1,12 @@
+name: airbnbShiny
+title: airbnbShiny
+username:
+account: gracewindheim
+server: shinyapps.io
+hostUrl: https://api.shinyapps.io/v1
+appId: 2289603
+bundleId: 3144288
+url: https://gracewindheim.shinyapps.io/airbnbShiny/
+when: 1589407757.74069
+asMultiple: FALSE
+asStatic: FALSE

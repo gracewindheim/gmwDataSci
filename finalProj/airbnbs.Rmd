@@ -22,6 +22,7 @@ head(orig)
 airpre = select(orig, price, room_type, bathrooms, bedrooms, reviews_per_month, accommodates, host_is_superhost)
 
 air = na.omit(airpre)
+head(air, 20)
 ```
 
 ```{r plots}
@@ -78,10 +79,16 @@ pricePred <- predict(lmMod, testData, interval = "predict")  # predict price
 output = data.frame(pricePred)
 
 actuals_preds <- data.frame(cbind(actuals = testData$price, predicteds = output$fit))  # make actuals_predicteds dataframe.
-correlation_accuracy <- cor(actuals_preds)  # 67.6%
-head(actuals_preds)
-correlation_accuracy
 
+correlation_accuracy <- cor(actuals_preds)  # 67.6%
+min_max_accuracy <- mean(apply(actuals_preds, 1, min) / apply(actuals_preds, 1, max))  
+# => 77.6%, min_max accuracy
+mape <- mean(abs((actuals_preds$predicteds - actuals_preds$actuals))/actuals_preds$actuals)  
+# => 30.9%, mean absolute percentage deviation
+
+correlation_accuracy
+min_max_accuracy
+mape
 ```
 
 ```{r user predict}
@@ -120,7 +127,8 @@ hline <- function(y = 0, color = "blue") {
 }
 
 # add prediction from user input
-finalPlot %>% layout(shapes = list(hline(lin$fit)))
+#finalPlot %>% layout(shapes = list(hline(lin$fit)))
+finalPlot
 ```
 
 
